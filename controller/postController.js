@@ -87,23 +87,31 @@ module.exports.deletePosts = async (req, res) => {
 };
 
 module.exports.updatePost = async (req, res) => {
-  const id = req.params.id;
-  const post = await Post.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
+  try {
+    const id = req.params.id;
+    const post = await Post.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
 
-  if (!post) {
-    return res.status(404).json({
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "No post found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      data: post,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
       success: false,
-      message: "No post found",
+      message: err.message || "Internal server error",
     });
   }
-
-  return res.status(200).json({
-    success: true,
-    message: "Post updated successfully",
-    data: post,
-  });
 };
